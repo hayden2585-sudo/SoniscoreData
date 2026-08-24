@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app.app_name }} - SoniscoreData App Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .app-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .app-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
+        .app-title {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .app-meta {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .app-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        
+        .download-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .download-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 18px 30px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            transform: scale(1.02);
+        }
+        
+        .download-btn.secondary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .download-btn.secondary:hover {
+            background: linear-gradient(135deg, #2980b9 0%, #1f6da0 100%);
+        }
+        
+        .features-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .features-list {
+            list-style: none;
+        }
+        
+        .features-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .features-list li:before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .reviews-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .review-form {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #2980b9 0%, #1f6da0 100%);
+            transform: scale(1.02);
+        }
+        
+        .review {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .review-rating {
+            color: #f39c12;
+            font-size: 20px;
+        }
+        
+        .review-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .review-comment {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .stats-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 20px;
+            }
+            
+            .app-title {
+                font-size: 24px;
+            }
+            
+            .download-section {
+                flex-direction: column;
+            }
+            
+            .download-btn {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">← Back to App Store</a>
+        
+        <div class="app-header">
+            <div class="app-icon">📊</div>
+            <h1 class="app-title">{{ app.app_name }}</h1>
+            <div class="app-meta">
+                v{{ app.version }} • {{ app.category }} • by {{ app.developer }}
+            </div>
+            <p class="app-description">{{ app.description }}</p>
+            
+            <div class="download-section">
+                <button class="download-btn" onclick="downloadApp('{{ app_id }}')">
+                    📥 Download for Android
+                </button>
+                <a href="https://github.com/hayden2585-sudo/SoniscoreData" class="download-btn secondary" target="_blank">
+                    🔍 View on GitHub
+                </a>
+            </div>
+        </div>
+        
+        <div class="features-section">
+            <h2 class="section-title">✨ Features</h2>
+            <ul class="features-list">
+                {% for feature in app.features %}
+                <li>{{ feature }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="stats-section">
+            <h2 class="section-title">📊 App Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ app.download_count }}</div>
+                    <div class="stat-label">Downloads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ "%.1f"|format(app.rating) }}</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ reviews|length }}</div>
+                    <div class="stat-label">Reviews</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ app.supported_platforms|length }}</div>
+                    <div class="stat-label">Platforms</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="reviews-section">
+            <h2 class="section-title">💬 Reviews & Ratings</h2>
+            
+            <div class="review-form">
+                <h3>Write a Review</h3>
+                <form id="reviewForm" onsubmit="submitReview(event)">
+                    <div class="form-group">
+                        <label for="rating">Rating</label>
+                        <select id="rating" name="rating" required>
+                            <option value="">Select rating</option>
+                            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ Very Good</option>
+                            <option value="3">⭐⭐⭐ Good</option>
+                            <option value="2">⭐⭐ Fair</option>
+                            <option value="1">⭐ Poor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Review</label>
+                        <textarea id="comment" name="comment" rows="4" placeholder="Share your experience with this app..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Submit Review</button>
+                </form>
+            </div>
+            
+            {% if reviews %}
+            <h3 class="section-title">Recent Reviews</h3>
+            {% for review in reviews %}
+            <div class="review">
+                <div class="review-header">
+                    <span class="review-rating">{{ '⭐' * review.rating }}</span>
+                    <span class="review-date">{{ review.timestamp[:10] }}</span>
+                </div>
+                <p class="review-comment">{{ review.comment }}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p style="text-align: center; color: #7f8c8d; padding: 20px;">
+                No reviews yet. Be the first to review!
+            </p>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 SoniscoreData App Store • Beta Testing Platform</p>
+        </div>
+    </div>
+    
+    <script>
+        function downloadApp(appId) {
+            fetch(`/download/${appId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.open(data.download_url, '_blank');
+                } else {
+                    alert('Download failed: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error downloading app: ' + error);
+            });
+        }
+        
+        function submitReview(event) {
+            event.preventDefault();
+            
+            const rating = document.getElementById('rating').value;
+            const comment = document.getElementById('comment').value;
+            
+            fetch(`/review/{{ app_id }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating: rating,
+                    comment: comment
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Review submitted successfully!');
+                    location.reload();
+                } else {
+                    alert('Failed to submit review: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error submitting review: ' + error);
+            });
+        }
+        
+        // Auto-refresh every 60 seconds
+        setInterval(() => {
+            location.reload();
+        }, 60000);
+    </script>
+</body>
+</html>
