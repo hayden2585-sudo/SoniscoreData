@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>SoniscoreData - Android Beta</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 16px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 24px 16px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .android-badge {
+            background: #3DDC84;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 20px 16px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 12px;
+            padding: 32px 16px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .upload-area:active {
+            background: #e3f2fd;
+            transform: scale(0.98);
+        }
+        
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+        
+        .upload-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .file-info {
+            margin-top: 16px;
+            padding: 12px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .process-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 16px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .process-btn:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, #2980b9 0%, #1f6da0 100%);
+        }
+        
+        .process-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .result-card h3 {
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .score-list {
+            list-style: none;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        
+        .score-item .rank {
+            font-weight: bold;
+            color: #e74c3c;
+            width: 24px;
+        }
+        
+        .score-item .name {
+            flex: 1;
+            margin: 0 8px;
+            font-size: 14px;
+        }
+        
+        .score-item .score {
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 32px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 16px;
+            color: #666;
+            font-size: 11px;
+            border-top: 1px solid #eee;
+        }
+        
+        .android-info {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #2e7d32;
+        }
+        
+        .android-info strong {
+            color: #1b5e20;
+        }
+        
+        /* Smooth animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Android-specific optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .header {
+                padding: 20px 12px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .content {
+                padding: 16px 12px;
+            }
+            
+            .upload-area {
+                padding: 24px 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Touch-friendly elements */
+        button, .upload-area {
+            min-height: 48px;
+            min-width: 48px;
+        }
+        
+        /* Better text selection on Android */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Prevent zoom on input focus */
+        input, textarea, select {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 SoniscoreData</h1>
+            <p>Android Beta Testing Version</p>
+            <div class="android-badge">🤖 ANDROID OPTIMIZED</div>
+        </div>
+        
+        <div class="content">
+            <div class="android-info">
+                <strong>✅ Android Optimized:</strong> No heavy dependencies, works on all Android devices
+            </div>
+            
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Tap to upload file</div>
+                <div class="upload-hint">Supports CSV, TXT, JSON</div>
+                <input type="file" id="fileInput" accept=".csv,.txt,.json">
+            </div>
+            
+            <!-- File Info -->
+            <div class="file-info" id="fileInfo">
+                <strong>📄 Selected File:</strong>
+                <span id="fileName"></span>
+                <span id="fileSize"></span>
+            </div>
+            
+            <!-- Process Button -->
+            <button class="process-btn" id="processBtn" disabled>
+                Process Data
+            </button>
+            
+            <!-- Loading Spinner -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your data...</p>
+            </div>
+            
+            <!-- Error Message -->
+            <div class="error" id="error"></div>
+            
+            <!-- Results -->
+            <div class="results" id="results">
+                <div class="result-card fade-in">
+                    <h3>📈 Processing Results</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalRows">-</div>
+                            <div class="stat-label">Rows Processed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="meanScore">-</div>
+                            <div class="stat-label">Mean Score</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="maxScore">-</div>
+                            <div class="stat-label">Max Score</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="minScore">-</div>
+                            <div class="stat-label">Min Score</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-card fade-in" id="topScoresCard" style="display: none;">
+                    <h3>🏆 Top 5 Scores</h3>
+                    <ul class="score-list" id="topScores"></ul>
+                </div>
+                
+                <div class="result-card fade-in" id="bottomScoresCard" style="display: none;">
+                    <h3>📉 Bottom 5 Scores</h3>
+                    <ul class="score-list" id="bottomScores"></ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>SoniscoreData v1.0 - Android Beta</p>
+            <p>Optimized for Android devices</p>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const processBtn = document.getElementById('processBtn');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const results = document.getElementById('results');
+        
+        let selectedFile = null;
+        
+        // Upload area click
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                displayFileInfo();
+                processBtn.disabled = false;
+                hideError();
+                hideResults();
+            }
+        });
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#27ae60';
+            uploadArea.style.background = '#e8f5e9';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#3498db';
+            uploadArea.style.background = '#f8f9fa';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#3498db';
+            uploadArea.style.background = '#f8f9fa';
+            
+            if (e.dataTransfer.files.length > 0) {
+                selectedFile = e.dataTransfer.files[0];
+                fileInput.files = e.dataTransfer.files;
+                displayFileInfo();
+                processBtn.disabled = false;
+                hideError();
+                hideResults();
+            }
+        });
+        
+        // Process button
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            
+            showLoading();
+            hideError();
+            hideResults();
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'Processing failed');
+                }
+            } catch (err) {
+                showError('Network error: ' + err.message);
+            } finally {
+                hideLoading();
+            }
+        });
+        
+        // Helper functions
+        function displayFileInfo() {
+            fileName.textContent = selectedFile.name;
+            fileSize.textContent = ` (${formatFileSize(selectedFile.size)})`;
+            fileInfo.classList.add('show');
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function showLoading() {
+            loading.classList.add('show');
+            processBtn.disabled = true;
+        }
+        
+        function hideLoading() {
+            loading.classList.remove('show');
+            processBtn.disabled = false;
+        }
+        
+        function showError(message) {
+            error.textContent = message;
+            error.classList.add('show');
+        }
+        
+        function hideError() {
+            error.classList.remove('show');
+        }
+        
+        function hideResults() {
+            results.classList.remove('show');
+        }
+        
+        function displayResults(data) {
+            // Update stats
+            document.getElementById('totalRows').textContent = data.rows_processed;
+            document.getElementById('meanScore').textContent = data.summary?.mean_score?.toFixed(4) || '-';
+            document.getElementById('maxScore').textContent = data.summary?.max_score?.toFixed(4) || '-';
+            document.getElementById('minScore').textContent = data.summary?.min_score?.toFixed(4) || '-';
+            
+            // Show top scores if available
+            if (data.top_scores && data.top_scores.length > 0) {
+                const topScoresCard = document.getElementById('topScoresCard');
+                const topScoresList = document.getElementById('topScores');
+                topScoresList.innerHTML = '';
+                
+                data.top_scores.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'score-item';
+                    li.innerHTML = `
+                        <span class="rank">#${item.rank || '-'}</span>
+                        <span class="name">${item.name || 'Item'}</span>
+                        <span class="score">${item.composite_score?.toFixed(4) || '0.0000'}</span>
+                    `;
+                    topScoresList.appendChild(li);
+                });
+                
+                topScoresCard.style.display = 'block';
+            }
+            
+            // Show bottom scores if available
+            if (data.bottom_scores && data.bottom_scores.length > 0) {
+                const bottomScoresCard = document.getElementById('bottomScoresCard');
+                const bottomScoresList = document.getElementById('bottomScores');
+                bottomScoresList.innerHTML = '';
+                
+                data.bottom_scores.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'score-item';
+                    li.innerHTML = `
+                        <span class="rank">#${item.rank || '-'}</span>
+                        <span class="name">${item.name || 'Item'}</span>
+                        <span class="score">${item.composite_score?.toFixed(4) || '0.0000'}</span>
+                    `;
+                    bottomScoresList.appendChild(li);
+                });
+                
+                bottomScoresCard.style.display = 'block';
+            }
+            
+            results.classList.add('show');
+        }
+        
+        // Check health on load
+        fetch('/health')
+            .then(response => response.json())
+            .then(data => console.log('Android app healthy:', data))
+            .catch(err => console.error('Health check failed:', err));
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# Android-Compatible Requirements
+# Lightweight dependencies for mobile beta testing
+# No pandas/numpy required for Android version
+
+# Core dependencies (lightweight)
+flask>=2.0.0
+
+# Optional: For enhanced features (not required for basic Android testing)
+# Flask-CORS>=3.0.0  # If needed for CORS
+# gunicorn>=20.1.0   # For production deployment
+
+# Notes:
+# - This version uses pure Python CSV/JSON parsing
+# - No pandas, numpy, matplotlib, or seaborn required
+# - Works on all Android devices without heavy dependencies
+# - File size: ~50KB vs ~500MB with full dependencies
