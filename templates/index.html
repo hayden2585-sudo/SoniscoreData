@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SoniscoreData - Mobile Beta</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #3498db;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #2980b9;
+            background: #e3f2fd;
+        }
+        
+        .upload-area.dragover {
+            border-color: #27ae60;
+            background: #e8f5e9;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .process-btn {
+            width: 100%;
+            padding: 18px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .process-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .process-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .result-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .score-list {
+            list-style: none;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        }
+        
+        .score-item .rank {
+            font-weight: bold;
+            color: #e74c3c;
+            width: 30px;
+        }
+        
+        .score-item .name {
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .score-item .score {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .upload-area {
+                padding: 30px 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Smooth animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 SoniscoreData</h1>
+            <p>Mobile Beta Testing Version</p>
+            <p style="margin-top: 10px; font-size: 12px;">Upload data to calculate composite scores</p>
+        </div>
+        
+        <div class="content">
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Tap to upload file</div>
+                <div class="upload-hint">Supports CSV, Excel (.xlsx), JSON</div>
+                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.json">
+            </div>
+            
+            <!-- File Info -->
+            <div class="file-info" id="fileInfo">
+                <strong>📄 Selected File:</strong>
+                <span id="fileName"></span>
+                <span id="fileSize"></span>
+            </div>
+            
+            <!-- Process Button -->
+            <button class="process-btn" id="processBtn" disabled>
+                Process Data
+            </button>
+            
+            <!-- Loading Spinner -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your data...</p>
+            </div>
+            
+            <!-- Error Message -->
+            <div class="error" id="error"></div>
+            
+            <!-- Results -->
+            <div class="results" id="results">
+                <div class="result-card fade-in">
+                    <h3>📈 Processing Results</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalRows">-</div>
+                            <div class="stat-label">Rows Processed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="meanScore">-</div>
+                            <div class="stat-label">Mean Score</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="maxScore">-</div>
+                            <div class="stat-label">Max Score</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="minScore">-</div>
+                            <div class="stat-label">Min Score</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-card fade-in" id="topScoresCard" style="display: none;">
+                    <h3>🏆 Top 5 Scores</h3>
+                    <ul class="score-list" id="topScores"></ul>
+                </div>
+                
+                <div class="result-card fade-in" id="bottomScoresCard" style="display: none;">
+                    <h3>📉 Bottom 5 Scores</h3>
+                    <ul class="score-list" id="bottomScores"></ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>SoniscoreData v1.0 - Mobile Beta</p>
+            <p>For testing purposes only</p>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const processBtn = document.getElementById('processBtn');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const results = document.getElementById('results');
+        
+        let selectedFile = null;
+        
+        // Upload area click
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                displayFileInfo();
+                processBtn.disabled = false;
+                hideError();
+                hideResults();
+            }
+        });
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length > 0) {
+                selectedFile = e.dataTransfer.files[0];
+                fileInput.files = e.dataTransfer.files;
+                displayFileInfo();
+                processBtn.disabled = false;
+                hideError();
+                hideResults();
+            }
+        });
+        
+        // Process button
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            
+            showLoading();
+            hideError();
+            hideResults();
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'Processing failed');
+                }
+            } catch (err) {
+                showError('Network error: ' + err.message);
+            } finally {
+                hideLoading();
+            }
+        });
+        
+        // Helper functions
+        function displayFileInfo() {
+            fileName.textContent = selectedFile.name;
+            fileSize.textContent = `(${formatFileSize(selectedFile.size)})`;
+            fileInfo.classList.add('show');
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function showLoading() {
+            loading.classList.add('show');
+            processBtn.disabled = true;
+        }
+        
+        function hideLoading() {
+            loading.classList.remove('show');
+            processBtn.disabled = false;
+        }
+        
+        function showError(message) {
+            error.textContent = message;
+            error.classList.add('show');
+        }
+        
+        function hideError() {
+            error.classList.remove('show');
+        }
+        
+        function hideResults() {
+            results.classList.remove('show');
+        }
+        
+        function displayResults(data) {
+            // Update stats
+            document.getElementById('totalRows').textContent = data.rows_processed;
+            document.getElementById('meanScore').textContent = data.summary?.mean_score?.toFixed(4) || '-';
+            document.getElementById('maxScore').textContent = data.summary?.max_score?.toFixed(4) || '-';
+            document.getElementById('minScore').textContent = data.summary?.min_score?.toFixed(4) || '-';
+            
+            // Show top scores if available
+            if (data.top_scores && data.top_scores.length > 0) {
+                const topScoresCard = document.getElementById('topScoresCard');
+                const topScoresList = document.getElementById('topScores');
+                topScoresList.innerHTML = '';
+                
+                data.top_scores.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'score-item';
+                    li.innerHTML = `
+                        <span class="rank">#${item.rank}</span>
+                        <span class="name">${item.name}</span>
+                        <span class="score">${item.composite_score.toFixed(4)}</span>
+                    `;
+                    topScoresList.appendChild(li);
+                });
+                
+                topScoresCard.style.display = 'block';
+            }
+            
+            // Show bottom scores if available
+            if (data.bottom_scores && data.bottom_scores.length > 0) {
+                const bottomScoresCard = document.getElementById('bottomScoresCard');
+                const bottomScoresList = document.getElementById('bottomScores');
+                bottomScoresList.innerHTML = '';
+                
+                data.bottom_scores.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'score-item';
+                    li.innerHTML = `
+                        <span class="rank">#${item.rank}</span>
+                        <span class="name">${item.name}</span>
+                        <span class="score">${item.composite_score.toFixed(4)}</span>
+                    `;
+                    bottomScoresList.appendChild(li);
+                });
+                
+                bottomScoresCard.style.display = 'block';
+            }
+            
+            results.classList.add('show');
+        }
+        
+        // Check health on load
+        fetch('/health')
+            .then(response => response.json())
+            .then(data => console.log('Service healthy:', data))
+            .catch(err => console.error('Health check failed:', err));
+    </script>
+</body>
+</html>

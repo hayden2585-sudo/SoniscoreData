@@ -17,8 +17,13 @@ logger = logging.getLogger(__name__)
 class DataVisualizer:
     """Create visualizations for score data."""
     
-    def __init__(self, style: str = 'seaborn-v0_8-whitegrid'):
+    def __init__(self, style: str = 'darkgrid'):
         self.style = style
+        # Validate style
+        valid_styles = ['white', 'dark', 'whitegrid', 'darkgrid', 'ticks']
+        if style not in valid_styles:
+            print(f"Warning: Invalid style '{style}', using 'darkgrid'")
+            style = 'darkgrid'
         sns.set_style(style)
         plt.rcParams['figure.figsize'] = (12, 8)
         
